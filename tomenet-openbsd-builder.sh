@@ -91,4 +91,3 @@ xset fp rehash
 ' > tomenet-tgfnt.sh
 chmod +x tomenet-tgfnt.sh
 echo "Complete!"
-
