@@ -1,5 +1,5 @@
 # TomeNET OpenBSD builder
-This script will download and build the TomeNET game with resources
+This script will download and build the [TomeNET](https://www.tomenet.eu) game with resources
 
 ### Usage
 ```bash
