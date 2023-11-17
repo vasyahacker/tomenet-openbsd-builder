@@ -1,16 +1,16 @@
-#!/bin/sh
-VERSION='4.8.0'
-REQUIREMENTS="bzip2 p7zip unzip gmake gcc libvorbis libogg sdl-mixer sdl-sound sdl libmikmod libgcrypt"
+#!/bin/ksh
+VERSION='4.9.1'
+REQUIREMENTS="bzip2 p7zip unzip gmake gcc libvorbis libogg sdl2-mixer sdl2 libmikmod libgcrypt"
 PACKAGE="tomenet-${VERSION}.tar.bz2"
 URL_PACKAGE="https://www.tomenet.eu/downloads/$PACKAGE"
-URL_SOUND="http://www.mediafire.com/?issv5sdv7kv3odq"
-URL_MUSIC="http://www.mediafire.com/?3j87kp3fgzpqrqn"
+URL_SOUND="http://www.mediafire.com/?issv5sdv7kv3odq/TomeNET-soundpack.7z/file"
+URL_MUSIC="http://www.mediafire.com/?3j87kp3fgzpqrqn/TomeNET-musicpack.7z/file"
 URL_FONTS='https://drive.google.com/uc?export=download&id=1CCnHi_BABM_n7ybYL_eiABOyd-kEL_xp'
 
 download(){
-	local url=$1
-	local to=$2
-	ftp -o $to $url
+	local url="$1"
+	local to="$2"
+	ftp -o "$to" "$url"
 }
 
 mfget() {
@@ -28,6 +28,7 @@ echo "The following packages need to be installed:
 $REQUIREMENTS
 Press ctrl-c to exit or enter to continue"
 read
+# shellcheck disable=SC2086
 doas pkg_add $REQUIREMENTS
 
 echo "Downloding sources.."
@@ -38,7 +39,7 @@ rm -f $PACKAGE
 cd tomenet-${VERSION}/src
 
 echo "Patching sources.."
-sed -i -e 's/^CC = gcc/CC = egcc/' -e 's/^CPP = cpp/CPP = ecpp/' -e 's/-lcrypt/-lgcrypt/g' makefile
+sed -i -e 's/shell ldconfig -p/shell ldconfig -r/' -e 's/^CC = gcc/CC = egcc/' -e 's/^CPP = cpp/CPP = ecpp/' -e 's/-lcrypt/-lgcrypt/g' makefile
 sed -i 's/^\#  include <sys\/timeb\.h>/\#  include <sys\/time\.h>/' common/h-system.h
 echo "Building.."
 gmake tomenet
@@ -65,7 +66,7 @@ rm -rf music
 
 echo "Installing Tangar's fonts..."
 _fdir="./fonts"
-download $URL_FONTS fonts.zip && unzip -q fonts.zip
+download "$URL_FONTS" fonts.zip && unzip -q fonts.zip
 rm -f fonts.zip
 mkdir -p $_fdir
 cp ./pcf/* $_fdir
@@ -74,6 +75,7 @@ rm -rf ./pcf
 cp ./prf/* ./lib/user/
 rm -rf ./prf
 
+# shellcheck disable=SC2016
 echo '#!/bin/sh
 MAIN_FONT="16x22tg"
 SMALLER_FONT="8x13"
@@ -91,3 +93,4 @@ xset fp rehash
 ' > tomenet-tgfnt.sh
 chmod +x tomenet-tgfnt.sh
 echo "Complete!"
+echo "run 'tomenet-tgfnt.sh' for graphic tiles mode or 'tomenet -c' for terminal mode"
